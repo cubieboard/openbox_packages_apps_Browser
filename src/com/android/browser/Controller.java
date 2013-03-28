@@ -19,6 +19,7 @@ package com.android.browser;
 import android.app.Activity;
 import android.app.DownloadManager;
 import android.app.SearchManager;
+import android.content.ActivityNotFoundException;
 import android.content.ClipboardManager;
 import android.content.ContentProvider;
 import android.content.ContentProviderClient;
@@ -1093,7 +1094,12 @@ public class Controller
                 mActivity.getComponentName().flattenToString());
         intent.putExtra(SEND_APP_ID_EXTRA, false);
         intent.putExtra(RecognizerIntent.EXTRA_WEB_SEARCH_ONLY, true);
-        mActivity.startActivity(intent);
+        try {
+			mActivity.startActivity(intent);
+		} catch (ActivityNotFoundException  e) {
+			// TODO Auto-generated catch block
+			Toast.makeText(mActivity, R.string.activity_not_found, Toast.LENGTH_LONG).show();
+		}
     }
 
     @Override
@@ -1510,7 +1516,11 @@ public class Controller
 
         boolean showDebugSettings = mSettings.isDebugEnabled();
         final MenuItem counter = menu.findItem(R.id.dump_counters_menu_id);
-        counter.setVisible(showDebugSettings);
+		/* modified by Gary. start {{----------------------------------- */
+		/* 2011-11-29 */
+		/* hide the 'dump v8 counters' menu item */
+        counter.setVisible(false);
+		/* add by Gary. end   -----------------------------------}} */
         counter.setEnabled(showDebugSettings);
         final MenuItem uaSwitcher = menu.findItem(R.id.ua_desktop_menu_id);
         uaSwitcher.setChecked(isDesktopUa);
@@ -2605,6 +2615,16 @@ public class Controller
         boolean shift = event.hasModifiers(KeyEvent.META_SHIFT_ON);
 
         switch(keyCode) {
+        	/*add by chenjd,chenjd@allwinnertech.com
+        	* add zoomIn and zoomOut by key
+        	*/
+        	case KeyEvent.KEYCODE_ZOOM_IN:
+        		getCurrentTopWebView().zoomIn();
+        		return true;
+        	case KeyEvent.KEYCODE_ZOOM_OUT:
+        		getCurrentTopWebView().zoomOut();
+        		return true;
+			/* end add........ */
             case KeyEvent.KEYCODE_TAB:
                 if (event.isCtrlPressed()) {
                     if (event.isShiftPressed()) {
